@@ -4,6 +4,7 @@ export const ERROR_CODE = {
   forbidden: "FORBIDDEN",
   notFound: "NOT_FOUND",
   conflict: "CONFLICT",
+  rateLimited: "RATE_LIMITED",
   validationError: "VALIDATION_ERROR",
   internalServerError: "INTERNAL_SERVER_ERROR",
 } as const;

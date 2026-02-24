@@ -16,12 +16,14 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@xchange/shared": "workspace:*",
     "@hono/node-server": "^1.19.9",
     "@hono/zod-openapi": "^1.2.2",
     "@hono/zod-validator": "^0.7.6",
+    "@xchange/config": "workspace:*",
+    "@xchange/shared": "workspace:*",
     "dotenv": "^17.3.1",
     "hono": "^4.12.2",
+    "hono-rate-limiter": "^0.5.3",
     "jsonwebtoken": "^9.0.3",
     "winston": "^3.19.0",
     "zod": "^4.3.6"

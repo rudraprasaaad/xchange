@@ -10,6 +10,7 @@ export const HTTP_STATUS_CODE = {
   forbidden: StatusCodes.FORBIDDEN,
   notFound: StatusCodes.NOT_FOUND,
   conflict: StatusCodes.CONFLICT,
+  tooManyRequests: StatusCodes.TOO_MANY_REQUESTS,
   unprocessableEntity: StatusCodes.UNPROCESSABLE_ENTITY,
 
   internalServerError: StatusCodes.INTERNAL_SERVER_ERROR,
