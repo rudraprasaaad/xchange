@@ -15,6 +15,7 @@
         "@hono/node-server": "^1.19.9",
         "@hono/zod-openapi": "^1.2.2",
         "@hono/zod-validator": "^0.7.6",
+        "@xchange/shared": "workspace:*",
         "dotenv": "^17.3.1",
         "hono": "^4.12.2",
         "jsonwebtoken": "^9.0.3",
@@ -33,9 +34,11 @@
       "name": "@xchange/config",
       "dependencies": {
         "http-status-codes": "^2.3.0",
+        "zod": "^4.3.6",
       },
       "devDependencies": {
         "@types/http-status-codes": "^1.2.0",
+        "@types/node": "^25.3.0",
       },
     },
     "packages/db": {
@@ -43,6 +46,12 @@
     },
     "packages/shared": {
       "name": "@xchange/shared",
+      "dependencies": {
+        "@xchange/config": "workspace:*",
+        "logform": "^2.7.0",
+        "winston": "^3.19.0",
+        "zod": "^4.3.6",
+      },
     },
   },
   "packages": {

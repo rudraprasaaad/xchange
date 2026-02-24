@@ -9,9 +9,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "http-status-codes": "^2.3.0"
+    "http-status-codes": "^2.3.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/http-status-codes": "^1.2.0"
+    "@types/http-status-codes": "^1.2.0",
+    "@types/node": "^25.3.0"
   }
 }
