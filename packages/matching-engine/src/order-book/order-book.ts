@@ -1,22 +1,34 @@
 import { Order } from "../order/order";
+import { OrderBookSide } from "./order-book-side";
 
 export class OrderBook {
-  private bids: Order[] = [];
-  private asks: Order[] = [];
+  constructor(
+    private readonly bidSide: OrderBookSide,
+    private readonly askSide: OrderBookSide,
+  ) {}
 
   add(order: Order): void {
     if (order.side === "buy") {
-      this.bids.push(order);
+      this.bidSide.add(order);
       return;
     }
-    this.asks.push(order);
+
+    this.askSide.add(order);
   }
 
-  getBids(): Order[] {
-    return this.bids;
+  bestBid(): Order | null {
+    return this.bidSide.best();
   }
 
-  getAsks(): Order[] {
-    return this.asks;
+  bestAsk(): Order | null {
+    return this.askSide.best();
+  }
+
+  getBidSide(): OrderBookSide {
+    return this.bidSide;
+  }
+
+  getAsksSide(): OrderBookSide {
+    return this.askSide;
   }
 }
