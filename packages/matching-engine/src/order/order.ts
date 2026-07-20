@@ -1,3 +1,4 @@
+import { OrderCreatedAt } from "./order-created-at";
 import { OrderId } from "./order-id";
 import { OrderPrice } from "./order-price";
 import { OrderQuantity } from "./order-quantity";
@@ -12,6 +13,7 @@ export class Order {
     public readonly side: OrderSide,
     public readonly price: OrderPrice,
     public readonly quantity: OrderQuantity,
+    public readonly createdAt: OrderCreatedAt,
   ) {
     this.remainingQuantity = new RemainingOrderQuantity(quantity.value);
   }
