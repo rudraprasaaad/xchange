@@ -8,4 +8,8 @@ export class OrderPrice {
   isGreaterThanOrEqualTo(other: OrderPrice): boolean {
     return this.value >= other.value;
   }
+
+  isLessThanOrEqualTo(other: OrderPrice): boolean {
+    return this.value <= other.value;
+  }
 }
