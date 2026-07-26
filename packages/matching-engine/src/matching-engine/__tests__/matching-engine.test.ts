@@ -4,11 +4,7 @@ import { BidOrderComparator } from "../../order-book/comparator/bid-order-compar
 import { OrderBook } from "../../order-book/order-book";
 import { OrderBookSide } from "../../order-book/order-book-side";
 import { MatchingEngine } from "../matching-engine";
-import { OrderId } from "../../order/order-id";
-import { Order } from "../../order/order";
-import { OrderQuantity } from "../../order/order-quantity";
-import { OrderPrice } from "../../order/order-price";
-import { OrderCreatedAt } from "../../order/order-created-at";
+import { OrderBuilder } from "../../test/builders/order-builder";
 
 function createOrderBook() {
   return new OrderBook(
@@ -22,13 +18,7 @@ describe("MatchingEngine", () => {
     const orderBook = createOrderBook();
     const matchingEngine = new MatchingEngine(orderBook);
 
-    const buyOrder = new Order(
-      new OrderId("1"),
-      "buy",
-      new OrderPrice(100),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date()),
-    );
+    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).build();
 
     const result = matchingEngine.process(buyOrder);
 
@@ -40,13 +30,7 @@ describe("MatchingEngine", () => {
     const orderBook = createOrderBook();
     const matchingEngine = new MatchingEngine(orderBook);
 
-    const sellOrder = new Order(
-      new OrderId("1"),
-      "sell",
-      new OrderPrice(100),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date()),
-    );
+    const sellOrder = OrderBuilder.aSellOrder().withPrice(100).build();
 
     const result = matchingEngine.process(sellOrder);
 
@@ -61,23 +45,11 @@ describe("MatchingEngine", () => {
     const orderBook = createOrderBook();
     const matchingEngine = new MatchingEngine(orderBook);
 
-    const sellOrder = new Order(
-      new OrderId("1"),
-      "sell",
-      new OrderPrice(100),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date()),
-    );
+    const sellOrder = OrderBuilder.aSellOrder().withPrice(100).build();
 
     orderBook.add(sellOrder);
 
-    const buyOrder = new Order(
-      new OrderId("2"),
-      "buy",
-      new OrderPrice(100),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date()),
-    );
+    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).build();
 
     const result = matchingEngine.process(buyOrder);
 
@@ -88,23 +60,11 @@ describe("MatchingEngine", () => {
     const orderBook = createOrderBook();
     const matchingEngine = new MatchingEngine(orderBook);
 
-    const sellOrder = new Order(
-      new OrderId("1"),
-      "sell",
-      new OrderPrice(101),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date()),
-    );
+    const sellOrder = OrderBuilder.aSellOrder().withPrice(101).build();
 
     orderBook.add(sellOrder);
 
-    const buyOrder = new Order(
-      new OrderId("2"),
-      "buy",
-      new OrderPrice(100),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date()),
-    );
+    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).build();
 
     const result = matchingEngine.process(buyOrder);
 
