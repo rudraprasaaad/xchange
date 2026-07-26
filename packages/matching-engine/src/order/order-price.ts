@@ -4,4 +4,8 @@ export class OrderPrice {
       throw new Error("Order price must be greater than zero");
     }
   }
+
+  isGreaterThanOrEqualTo(other: OrderPrice): boolean {
+    return this.value >= other.value;
+  }
 }

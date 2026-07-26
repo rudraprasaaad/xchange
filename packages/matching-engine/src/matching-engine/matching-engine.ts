@@ -1,5 +1,6 @@
 import { OrderBook } from "../order-book/order-book";
 import { Order } from "../order/order";
+import { Trade } from "../trade/trade";
 import { MatchingResult } from "./matching-result";
 
 export class MatchingEngine {
@@ -20,8 +21,18 @@ export class MatchingEngine {
       };
     }
 
+    if (
+      incomingOrder.side === "buy" &&
+      !incomingOrder.price.isGreaterThanOrEqualTo(restingOrder.price)
+    ) {
+      return {
+        trades: [],
+        restingOrder: incomingOrder,
+      };
+    }
+
     return {
-      trades: [],
+      trades: [new Trade()],
       restingOrder: null,
     };
   }

@@ -56,4 +56,58 @@ describe("MatchingEngine", () => {
     expect(orderBook.bestAsk()).toBe(sellOrder);
     expect(orderBook.bestBid()).toBe(null);
   });
+
+  it("creates a trade when an incoming buy order crosses the best sell order", () => {
+    const orderBook = createOrderBook();
+    const matchingEngine = new MatchingEngine(orderBook);
+
+    const sellOrder = new Order(
+      new OrderId("1"),
+      "sell",
+      new OrderPrice(100),
+      new OrderQuantity(1),
+      new OrderCreatedAt(new Date()),
+    );
+
+    orderBook.add(sellOrder);
+
+    const buyOrder = new Order(
+      new OrderId("2"),
+      "buy",
+      new OrderPrice(100),
+      new OrderQuantity(1),
+      new OrderCreatedAt(new Date()),
+    );
+
+    const result = matchingEngine.process(buyOrder);
+
+    expect(result.trades).toHaveLength(1);
+  });
+
+  it("does not create a trade when an incoming buy order price is lower than the best ask", () => {
+    const orderBook = createOrderBook();
+    const matchingEngine = new MatchingEngine(orderBook);
+
+    const sellOrder = new Order(
+      new OrderId("1"),
+      "sell",
+      new OrderPrice(101),
+      new OrderQuantity(1),
+      new OrderCreatedAt(new Date()),
+    );
+
+    orderBook.add(sellOrder);
+
+    const buyOrder = new Order(
+      new OrderId("2"),
+      "buy",
+      new OrderPrice(100),
+      new OrderQuantity(1),
+      new OrderCreatedAt(new Date()),
+    );
+
+    const result = matchingEngine.process(buyOrder);
+
+    expect(result.trades).toHaveLength(0);
+  });
 });
