@@ -71,4 +71,17 @@ describe("MatchingEngine", () => {
 
     expect(result.trades).toHaveLength(0);
   });
+
+  it("does not create a trade when an incoming sell order price is larger than the best bid", () => {
+    const orderBook = createOrderBook();
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+
+    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).build();
+    orderBook.add(buyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder().withPrice(101).build();
+    const result = matchingEngine.process(sellOrder);
+
+    expect(result.trades).toHaveLength(0);
+  });
 });
