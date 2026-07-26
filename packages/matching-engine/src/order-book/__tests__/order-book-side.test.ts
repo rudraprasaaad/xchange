@@ -1,13 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { Order } from "../../order/order";
-import { OrderCreatedAt } from "../../order/order-created-at";
-import { OrderId } from "../../order/order-id";
-import { OrderPrice } from "../../order/order-price";
-import { OrderQuantity } from "../../order/order-quantity";
 import { OrderBookSide } from "../order-book-side";
 import { AskOrderComparator } from "../comparator/ask-order-comparator";
 import { BidOrderComparator } from "../comparator/bid-order-comparator";
+import { OrderBuilder } from "../../test/builders/order-builder";
 
 function createAskSide() {
   return new OrderBookSide(new AskOrderComparator());
@@ -27,13 +23,7 @@ describe("OrderBookSide", () => {
   it("returns the best order after adding a single order", () => {
     const side = createAskSide();
 
-    const order = new Order(
-      new OrderId("1"),
-      "sell",
-      new OrderPrice(100),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date()),
-    );
+    const order = OrderBuilder.aSellOrder().withPrice(100).build();
 
     side.add(order);
 
@@ -43,21 +33,8 @@ describe("OrderBookSide", () => {
   it("returns the highest priority order after adding multiple orders", () => {
     const side = createAskSide();
 
-    const higherPriceOrder = new Order(
-      new OrderId("1"),
-      "sell",
-      new OrderPrice(105),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date("2026-01-01")),
-    );
-
-    const lowerPriceOrder = new Order(
-      new OrderId("2"),
-      "sell",
-      new OrderPrice(100),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date("2026-01-02")),
-    );
+    const higherPriceOrder = OrderBuilder.aSellOrder().withPrice(105).build();
+    const lowerPriceOrder = OrderBuilder.aSellOrder().withPrice(100).build();
 
     side.add(higherPriceOrder);
     side.add(lowerPriceOrder);
@@ -68,21 +45,8 @@ describe("OrderBookSide", () => {
   it("returns the highest priority buy order after adding multiple orders", () => {
     const side = createBidSide();
 
-    const lowerPriceOrder = new Order(
-      new OrderId("1"),
-      "buy",
-      new OrderPrice(100),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date("2026-01-01")),
-    );
-
-    const higherPriceOrder = new Order(
-      new OrderId("2"),
-      "buy",
-      new OrderPrice(105),
-      new OrderQuantity(1),
-      new OrderCreatedAt(new Date("2026-01-02")),
-    );
+    const lowerPriceOrder = OrderBuilder.aBuyOrder().withPrice(100).build();
+    const higherPriceOrder = OrderBuilder.aBuyOrder().withPrice(105).build();
 
     side.add(lowerPriceOrder);
     side.add(higherPriceOrder);
