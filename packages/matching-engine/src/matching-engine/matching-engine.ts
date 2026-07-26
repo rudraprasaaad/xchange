@@ -1,10 +1,14 @@
+import { MatchingPolicy } from "../matching/matching-policy";
 import { OrderBook } from "../order-book/order-book";
 import { Order } from "../order/order";
 import { Trade } from "../trade/trade";
 import { MatchingResult } from "./matching-result";
 
 export class MatchingEngine {
-  constructor(private readonly orderBook: OrderBook) {}
+  constructor(
+    private readonly orderBook: OrderBook,
+    private readonly matchingPolicy: MatchingPolicy,
+  ) {}
 
   process(incomingOrder: Order): MatchingResult {
     const restingOrder =
@@ -21,10 +25,7 @@ export class MatchingEngine {
       };
     }
 
-    if (
-      incomingOrder.side === "buy" &&
-      !incomingOrder.price.isGreaterThanOrEqualTo(restingOrder.price)
-    ) {
+    if (!this.matchingPolicy.canMatch(incomingOrder, restingOrder)) {
       return {
         trades: [],
         restingOrder: incomingOrder,

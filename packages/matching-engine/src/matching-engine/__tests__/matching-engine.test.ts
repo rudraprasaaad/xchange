@@ -5,6 +5,7 @@ import { OrderBook } from "../../order-book/order-book";
 import { OrderBookSide } from "../../order-book/order-book-side";
 import { MatchingEngine } from "../matching-engine";
 import { OrderBuilder } from "../../test/builders/order-builder";
+import { MatchingPolicy } from "../../matching/matching-policy";
 
 function createOrderBook() {
   return new OrderBook(
@@ -16,7 +17,7 @@ function createOrderBook() {
 describe("MatchingEngine", () => {
   it("adds an incoming buy order to the order book when no matching sell order exists", () => {
     const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook);
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
 
     const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).build();
 
@@ -28,7 +29,7 @@ describe("MatchingEngine", () => {
 
   it("adds an incoming sell order to the order book when no matching buy order exists", () => {
     const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook);
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
 
     const sellOrder = OrderBuilder.aSellOrder().withPrice(100).build();
 
@@ -43,7 +44,7 @@ describe("MatchingEngine", () => {
 
   it("creates a trade when an incoming buy order crosses the best sell order", () => {
     const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook);
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
 
     const sellOrder = OrderBuilder.aSellOrder().withPrice(100).build();
 
@@ -58,7 +59,7 @@ describe("MatchingEngine", () => {
 
   it("does not create a trade when an incoming buy order price is lower than the best ask", () => {
     const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook);
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
 
     const sellOrder = OrderBuilder.aSellOrder().withPrice(101).build();
 
