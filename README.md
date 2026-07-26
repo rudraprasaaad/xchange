@@ -53,7 +53,28 @@ An `Order` exposes three methods:
 
 ### Order book
 
-The `OrderBook` class maintains two separate lists: bids (buy orders) and asks (sell orders). Orders are added via `add(order)` and retrieved via `getBids()` and `getAsks()`.
+The `OrderBook` class maintains two `OrderBookSide` instances, one for bids (buy orders) and one for asks (sell orders). Orders are added via `add(order)`, which routes the order to the correct side based on `order.side`. The current best price on each side is available via `bestBid()` and `bestAsk()`.
+
+Each `OrderBookSide` keeps its orders sorted using an `OrderComparator`:
+
+- `BidOrderComparator` - sorts by highest price first, then earliest `createdAt` (price-time priority for buy orders)
+- `AskOrderComparator` - sorts by lowest price first, then earliest `createdAt` (price-time priority for sell orders)
+
+`OrderBookSide.best()` returns the highest-priority order (or `null` if the side is empty), and `getOrders()` exposes the full sorted list.
+
+### Matching engine
+
+The `MatchingEngine` takes an `OrderBook` and a `MatchingPolicy`, and exposes a single `process(incomingOrder)` method that returns a `MatchingResult` (`{ trades, restingOrder }`):
+
+- If there is no opposing resting order, the incoming order is added to the book and returned as the `restingOrder`.
+- If a resting order exists but the `MatchingPolicy` determines it cannot match (buy price below best ask, or sell price above best bid), the incoming order is returned unmatched with no trades.
+- If the orders cross, a `Trade` is produced and returned in `trades`.
+
+`MatchingPolicy.canMatch(incoming, resting)` encodes the crossing rule: a buy order matches when its price is greater than or equal to the resting price (`OrderPrice.isGreaterThanOrEqualTo`); a sell order matches when its price is less than or equal to the resting price (`OrderPrice.isLessThanOrEqualTo`).
+
+### Testing
+
+Tests use the `OrderBuilder` test helper (`src/test/builders/order-builder.ts`) to construct valid `Order` instances without repeating value-object boilerplate, e.g. `OrderBuilder.aBuyOrder().withPrice(100).withQuantity(2).build()`.
 
 ## Utilities
 
