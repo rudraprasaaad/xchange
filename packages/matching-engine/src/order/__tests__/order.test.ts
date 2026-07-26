@@ -3,6 +3,7 @@ import { Order } from "../order";
 import { OrderId } from "../order-id";
 import { OrderPrice } from "../order-price";
 import { OrderQuantity } from "../order-quantity";
+import { OrderCreatedAt } from "../order-created-at";
 
 describe("Order", () => {
   test("reduces remaining quantity when filled", () => {
@@ -11,6 +12,7 @@ describe("Order", () => {
       "buy",
       new OrderPrice(100000),
       new OrderQuantity(5),
+      new OrderCreatedAt(new Date()),
     );
 
     order.fill(new OrderQuantity(2));
@@ -24,6 +26,7 @@ describe("Order", () => {
       "buy",
       new OrderPrice(100000),
       new OrderQuantity(5),
+      new OrderCreatedAt(new Date()),
     );
 
     order.fill(new OrderQuantity(5));
@@ -38,6 +41,7 @@ describe("Order", () => {
       "sell",
       new OrderPrice(99000),
       new OrderQuantity(5),
+      new OrderCreatedAt(new Date()),
     );
 
     order.fill(new OrderQuantity(2));
