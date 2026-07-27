@@ -32,6 +32,10 @@ export class MatchingEngine {
       };
     }
 
+    const tradedQuantity = incomingOrder.quantity;
+    restingOrder.fill(tradedQuantity);
+    incomingOrder.fill(tradedQuantity);
+
     return {
       trades: [new Trade()],
       restingOrder: null,
