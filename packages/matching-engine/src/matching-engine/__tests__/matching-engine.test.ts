@@ -115,9 +115,6 @@ describe("MatchingEngine", () => {
       .build();
 
     matchinEngine.process(sellOrder);
-
-    matchinEngine.process(sellOrder);
-
     expect(buyOrder.quantity.value).toBe(0);
     expect(sellOrder.quantity.value).toBe(0);
   });
