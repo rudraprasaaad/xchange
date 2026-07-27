@@ -162,4 +162,25 @@ describe("MatchingEngine", () => {
     expect(buyOrder.getRemainingQuantity().value).toBe(0);
     expect(sellOrder.getRemainingQuantity().value).toBe(6);
   });
+
+  it("removes a fully filled resting order from the order book", () => {
+    const orderBook = createOrderBook();
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
+
+    orderBook.add(buyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
+
+    matchingEngine.process(sellOrder);
+
+    expect(orderBook.bestBid()).toBeNull();
+  });
 });
