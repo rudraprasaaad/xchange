@@ -140,4 +140,26 @@ describe("MatchingEngine", () => {
     expect(buyOrder.getRemainingQuantity().value).toBe(6);
     expect(sellOrder.getRemainingQuantity().value).toBe(0);
   });
+
+  it("partially fills the incoming sell order when the resting buy order quantity is smaller", () => {
+    const orderBook = createOrderBook();
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(4)
+      .build();
+
+    orderBook.add(buyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
+
+    matchingEngine.process(sellOrder);
+
+    expect(buyOrder.getRemainingQuantity().value).toBe(0);
+    expect(buyOrder.getRemainingQuantity().value).toBe(6);
+  });
 });
