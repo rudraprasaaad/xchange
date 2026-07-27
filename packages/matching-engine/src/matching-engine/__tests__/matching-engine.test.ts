@@ -97,4 +97,28 @@ describe("MatchingEngine", () => {
     const result = matchingEngine.process(sellOrder);
     expect(result.trades).toHaveLength(1);
   });
+
+  it("reduces the quantities of both orders after a successful trade", () => {
+    const orderBook = createOrderBook();
+    const matchinEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
+
+    orderBook.add(buyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
+
+    matchinEngine.process(sellOrder);
+
+    matchinEngine.process(sellOrder);
+
+    expect(buyOrder.quantity.value).toBe(0);
+    expect(sellOrder.quantity.value).toBe(0);
+  });
 });
