@@ -1,6 +1,7 @@
 import { MatchingPolicy } from "../matching/matching-policy";
 import { OrderBook } from "../order-book/order-book";
 import { Order } from "../order/order";
+import { OrderQuantity } from "../order/order-quantity";
 import { Trade } from "../trade/trade";
 import { MatchingResult } from "./matching-result";
 
@@ -32,7 +33,13 @@ export class MatchingEngine {
       };
     }
 
-    const tradedQuantity = incomingOrder.quantity;
+    const tradedQuantity = new OrderQuantity(
+      Math.min(
+        incomingOrder.getRemainingQuantity().value,
+        restingOrder.getRemainingQuantity().value,
+      ),
+    );
+
     restingOrder.fill(tradedQuantity);
     incomingOrder.fill(tradedQuantity);
 

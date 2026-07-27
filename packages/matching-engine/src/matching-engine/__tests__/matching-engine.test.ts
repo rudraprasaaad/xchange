@@ -160,6 +160,6 @@ describe("MatchingEngine", () => {
     matchingEngine.process(sellOrder);
 
     expect(buyOrder.getRemainingQuantity().value).toBe(0);
-    expect(buyOrder.getRemainingQuantity().value).toBe(6);
+    expect(sellOrder.getRemainingQuantity().value).toBe(6);
   });
 });
