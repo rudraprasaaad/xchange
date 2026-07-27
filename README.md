@@ -68,7 +68,7 @@ The `MatchingEngine` takes an `OrderBook` and a `MatchingPolicy`, and exposes a 
 
 - If there is no opposing resting order, the incoming order is added to the book and returned as the `restingOrder`.
 - If a resting order exists but the `MatchingPolicy` determines it cannot match (buy price below best ask, or sell price above best bid), the incoming order is returned unmatched with no trades.
-- If the orders cross, a `Trade` is produced and returned in `trades`.
+- If the orders cross, the traded quantity is the minimum of the two orders' remaining quantities. Both the incoming and resting orders are filled by that amount via `Order.fill()`, a `Trade` is produced and returned in `trades`, and a resting order that becomes fully filled is dropped from the `OrderBook` (so it no longer appears via `bestBid()`/`bestAsk()`).
 
 `MatchingPolicy.canMatch(incoming, resting)` encodes the crossing rule: a buy order matches when its price is greater than or equal to the resting price (`OrderPrice.isGreaterThanOrEqualTo`); a sell order matches when its price is less than or equal to the resting price (`OrderPrice.isLessThanOrEqualTo`).
 
