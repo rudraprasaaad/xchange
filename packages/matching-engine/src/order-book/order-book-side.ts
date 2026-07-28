@@ -11,6 +11,16 @@ export class OrderBookSide {
     this.orders.sort(this.comparator.compare);
   }
 
+  remove(order: Order): void {
+    const index = this.orders.findIndex((existingOrder) =>
+      existingOrder.id.equals(order.id),
+    );
+
+    if (index === -1) throw new Error("Order not found");
+
+    this.orders.splice(index, 1);
+  }
+
   getOrders(): readonly Order[] {
     return this.orders;
   }

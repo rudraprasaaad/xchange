@@ -4,4 +4,7 @@ export class OrderId {
       throw new Error("Order id must not be empty");
     }
   }
+  equals(other: OrderId): boolean {
+    return this.value === other.value;
+  }
 }

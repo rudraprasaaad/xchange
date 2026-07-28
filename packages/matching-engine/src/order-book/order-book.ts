@@ -16,6 +16,13 @@ export class OrderBook {
     this.askSide.add(order);
   }
 
+  remove(order: Order): void {
+    if (order.side === "buy") {
+      this.bidSide.remove(order);
+      return;
+    }
+  }
+
   bestBid(): Order | null {
     return this.bidSide.best();
   }
