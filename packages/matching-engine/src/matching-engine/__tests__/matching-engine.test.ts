@@ -207,4 +207,36 @@ describe("MatchingEngine", () => {
     expect(orderBook.bestAsk()).toBe(sellOrder);
     expect(orderBook.bestAsk()?.getRemainingQuantity().value).toBe(6);
   });
+
+  it("continues matching the incoming sell order until it is fully filled", () => {
+    const orderBook = createOrderBook();
+    const matchinEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+
+    const firstBuyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(4)
+      .build();
+
+    const secondBuyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(6)
+      .build();
+
+    orderBook.add(firstBuyOrder);
+    orderBook.add(secondBuyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
+
+    matchinEngine.process(sellOrder);
+
+    expect(orderBook.bestBid()).toBeNull();
+    expect(orderBook.bestAsk()).toBeNull();
+
+    expect(firstBuyOrder.isFilled()).toBe(true);
+    expect(secondBuyOrder.isFilled()).toBe(true);
+    expect(sellOrder.isFilled()).toBe(true);
+  });
 });
