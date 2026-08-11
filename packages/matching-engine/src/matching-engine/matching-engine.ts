@@ -12,7 +12,10 @@ export class MatchingEngine {
   ) {}
 
   process(incomingOrder: Order): MatchingResult {
-    const restingOrder =
+    const trades: Trade[] = [];
+
+    while(!incomingOrder.isFilled()) {
+      const restingOrder =
       incomingOrder.side === "buy"
         ? this.orderBook.bestAsk()
         : this.orderBook.bestBid();
@@ -44,11 +47,15 @@ export class MatchingEngine {
     incomingOrder.fill(tradedQuantity);
 
     if (restingOrder.isFilled()) this.orderBook.remove(restingOrder);
+
+    trades.push(new Trade());
+    }
+    
     if (!incomingOrder.isFilled()) this.orderBook.add(incomingOrder);
 
     return {
       trades: [new Trade()],
-      restingOrder: null,
+      restingOrder: incomingOrder.isFilled() ? null : incomingOrder,
     };
   }
 }
