@@ -15,10 +15,19 @@ function createOrderBook() {
   );
 }
 
+function createMatchingEngine(){
+  const orderBook = createOrderBook();
+
+  const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+
+  return {
+    orderBook, matchingEngine,
+  }
+}
+
 describe("MatchingEngine", () => {
   it("adds an incoming buy order to the order book when no matching sell order exists", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).build();
 
@@ -29,8 +38,7 @@ describe("MatchingEngine", () => {
   });
 
   it("adds an incoming sell order to the order book when no matching buy order exists", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const sellOrder = OrderBuilder.aSellOrder().withPrice(100).build();
 
@@ -44,8 +52,7 @@ describe("MatchingEngine", () => {
   });
 
   it("creates a trade when an incoming buy order crosses the best sell order", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const sellOrder = OrderBuilder.aSellOrder().withPrice(100).build();
 
@@ -59,8 +66,7 @@ describe("MatchingEngine", () => {
   });
 
   it("does not create a trade when an incoming buy order price is lower than the best ask", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const sellOrder = OrderBuilder.aSellOrder().withPrice(101).build();
 
@@ -74,8 +80,7 @@ describe("MatchingEngine", () => {
   });
 
   it("does not create a trade when an incoming sell order price is larger than the best bid", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).build();
     orderBook.add(buyOrder);
@@ -87,8 +92,7 @@ describe("MatchingEngine", () => {
   });
 
   it("creates a trade when an incoming sell order price equals the best bid", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).build();
     orderBook.add(buyOrder);
@@ -100,8 +104,7 @@ describe("MatchingEngine", () => {
   });
 
   it("reduces the quantities of both orders after a successful trade", () => {
-    const orderBook = createOrderBook();
-    const matchinEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder()
       .withPrice(100)
@@ -115,14 +118,13 @@ describe("MatchingEngine", () => {
       .withQuantity(10)
       .build();
 
-    matchinEngine.process(sellOrder);
+    matchingEngine.process(sellOrder);
     expect(buyOrder.getRemainingQuantity().value).toBe(0);
     expect(sellOrder.getRemainingQuantity().value).toBe(0);
   });
 
   it("partially fills the resting buy order when the incoming sell order quantity is smaller", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder()
       .withPrice(100)
@@ -143,8 +145,7 @@ describe("MatchingEngine", () => {
   });
 
   it("partially fills the incoming sell order when the resting buy order quantity is smaller", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder()
       .withPrice(100)
@@ -165,8 +166,7 @@ describe("MatchingEngine", () => {
   });
 
   it("removes a fully filled resting order from the order book", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder()
       .withPrice(100)
@@ -186,8 +186,7 @@ describe("MatchingEngine", () => {
   });
 
   it("adds the remaining incoming sell order to the order book when it is partially filled", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder()
       .withPrice(100)
@@ -210,8 +209,7 @@ describe("MatchingEngine", () => {
   });
 
   it("continues matching the incoming sell order until it is fully filled", () => {
-    const orderBook = createOrderBook();
-    const matchinEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const firstBuyOrder = OrderBuilder.aBuyOrder()
       .withPrice(100)
@@ -231,7 +229,7 @@ describe("MatchingEngine", () => {
       .withQuantity(10)
       .build();
 
-    matchinEngine.process(sellOrder);
+    matchingEngine.process(sellOrder);
 
     expect(orderBook.bestBid()).toBeNull();
     expect(orderBook.bestAsk()).toBeNull();
@@ -242,8 +240,7 @@ describe("MatchingEngine", () => {
   });
 
   it("records the traded quantity", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).withQuantity(10).build();
 
@@ -259,8 +256,7 @@ describe("MatchingEngine", () => {
   })
 
   it("records the resting order price as the trade price", () => {
-    const orderBook = createOrderBook();
-    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
     const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).withQuantity(10).build();
     orderBook.add(buyOrder);
