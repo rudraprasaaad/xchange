@@ -271,6 +271,6 @@ describe("MatchingEngine", () => {
 
     expect(result.trades).toHaveLength(1);
     const trade = result.trades[0];
-    expect(trade!.quantity.value).toBe(100);
+    expect(trade!.price.value).toBe(100);
   })
 });

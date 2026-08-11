@@ -48,7 +48,7 @@ export class MatchingEngine {
 
     if (restingOrder.isFilled()) this.orderBook.remove(restingOrder);
 
-    trades.push(new Trade(tradedQuantity));
+    trades.push(new Trade(tradedQuantity, restingOrder.price));
     }
     
     if (!incomingOrder.isFilled()) this.orderBook.add(incomingOrder);
