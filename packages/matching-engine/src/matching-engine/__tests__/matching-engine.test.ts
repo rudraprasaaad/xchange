@@ -284,4 +284,19 @@ describe("MatchingEngine", () => {
     const trade = result.trades[0];
     expect(trade!.restingOrderId).toBe(buyOrder.id);
   })
+
+  it("records the incoming order id on the trade", () => {
+    const { orderBook, matchingEngine} = createMatchingEngine();
+
+    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).withQuantity(10).build();
+    orderBook.add(buyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder().withPrice(99).withQuantity(10).build();
+
+    const result = matchingEngine.process(sellOrder);
+
+    expect(result.trades).toHaveLength(1);
+    const trade = result.trades[0];
+    expect(trade!.incomingOrderId).toBe(sellOrder.id);
+  })
 });
