@@ -2,41 +2,6 @@
 
 A monorepo for a stock exchange platform built with Turborepo and pnpm workspaces.
 
-## Packages
-
-- `web`: the main Next.js application (starter scaffold)
-- `docs`: Next.js documentation app (starter scaffold)
-- `@repo/matching-engine`: core order matching engine
-- `@repo/ui`: shared React component library
-- `@repo/eslint-config`: shared ESLint configuration
-- `@repo/typescript-config`: shared TypeScript configuration
-
-## Getting Started
-
-Install dependencies:
-
-```sh
-pnpm install
-```
-
-Run all packages in development mode:
-
-```sh
-turbo dev
-```
-
-Run a specific package:
-
-```sh
-turbo dev --filter=web
-```
-
-Run matching-engine tests:
-
-```sh
-turbo test --filter=@repo/matching-engine
-```
-
 ## Implementation Status
 
 The project is in early development. The `@repo/matching-engine` package contains a working, test-driven core for limit-order matching. The `web` and `docs` apps are still default Turborepo/Next.js starters and are not yet connected to the matching engine.
@@ -145,3 +110,38 @@ Tests use the `OrderBuilder` test helper (`src/test/builders/order-builder.ts`) 
 - [ESLint](https://eslint.org/) for code linting
 - [Prettier](https://prettier.io) for code formatting
 - [Vitest](https://vitest.dev/) for unit testing
+
+## Packages
+
+- `web`: the main Next.js application (starter scaffold)
+- `docs`: Next.js documentation app (starter scaffold)
+- `@repo/matching-engine`: core order matching engine
+- `@repo/ui`: shared React component library
+- `@repo/eslint-config`: shared ESLint configuration
+- `@repo/typescript-config`: shared TypeScript configuration
+
+## Getting Started
+
+Install dependencies:
+
+```sh
+pnpm install
+```
+
+Run all packages in development mode:
+
+```sh
+turbo dev
+```
+
+Run a specific package:
+
+```sh
+turbo dev --filter=web
+```
+
+Run matching-engine tests:
+
+```sh
+turbo test --filter=@repo/matching-engine
+```
