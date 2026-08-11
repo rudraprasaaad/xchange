@@ -257,4 +257,20 @@ describe("MatchingEngine", () => {
     const trade = result.trades[0];
     expect(trade!.quantity.value).toBe(10);
   })
+
+  it("records the resting order price as the trade price", () => {
+    const orderBook = createOrderBook();
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+
+    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).withQuantity(10).build();
+    orderBook.add(buyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder().withPrice(99).withQuantity(10).build();
+
+    const result = matchingEngine.process(sellOrder);
+
+    expect(result.trades).toHaveLength(1);
+    const trade = result.trades[0];
+    expect(trade!.quantity.value).toBe(100);
+  })
 });
