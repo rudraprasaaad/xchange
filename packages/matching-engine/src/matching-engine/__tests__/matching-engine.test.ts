@@ -6,6 +6,7 @@ import { OrderBookSide } from "../../order-book/order-book-side";
 import { MatchingEngine } from "../matching-engine";
 import { OrderBuilder } from "../../test/builders/order-builder";
 import { MatchingPolicy } from "../../matching/matching-policy";
+import { Order } from "../../order/order";
 
 function createOrderBook() {
   return new OrderBook(
@@ -239,4 +240,21 @@ describe("MatchingEngine", () => {
     expect(secondBuyOrder.isFilled()).toBe(true);
     expect(sellOrder.isFilled()).toBe(true);
   });
+
+  it("records the traded quantity", () => {
+    const orderBook = createOrderBook();
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+
+    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).withQuantity(10).build();
+
+    orderBook.add(buyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder().withPrice(100).withQuantity(10).build();
+
+    const result = matchingEngine.process(sellOrder);
+
+    expect(result.trades).toHaveLength(1);
+    const trade = result.trades[0];
+    expect(trade!.quantity.value).toBe(10);
+  })
 });
