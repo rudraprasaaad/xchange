@@ -467,4 +467,23 @@ describe("MatchingEngine", () => {
     expect(orderBook.bestAsk()).toBe(secondSellOrder);
     expect(orderBook.bestBid()).toBe(buyOrder);
   });
+
+  it("prioritizes the earlier buy order when prices are equal", () => {
+    const { orderBook } = createMatchingEngine();
+
+    const earlierOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withCreatedAt(new Date("2026-01-01T10:00:00Z"))
+      .build();
+
+    const laterOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withCreatedAt(new Date("2026-01-01T10:01:00Z"))
+      .build();
+
+    orderBook.add(laterOrder);
+    orderBook.add(earlierOrder);
+
+    expect(orderBook.bestBid()).toBe(earlierOrder);
+  });
 });

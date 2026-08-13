@@ -37,6 +37,11 @@ export class OrderBuilder {
     return this;
   }
 
+  withCreatedAt(createdAt: Date): this {
+    this.createdAt = createdAt;
+    return this;
+  }
+
   build() {
     const orderId =
       this.side === "buy"
