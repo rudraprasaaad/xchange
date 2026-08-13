@@ -15,14 +15,15 @@ function createOrderBook() {
   );
 }
 
-function createMatchingEngine(){
+function createMatchingEngine() {
   const orderBook = createOrderBook();
 
   const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
 
   return {
-    orderBook, matchingEngine,
-  }
+    orderBook,
+    matchingEngine,
+  };
 }
 
 describe("MatchingEngine", () => {
@@ -242,61 +243,109 @@ describe("MatchingEngine", () => {
   it("records the traded quantity", () => {
     const { orderBook, matchingEngine } = createMatchingEngine();
 
-    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).withQuantity(10).build();
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
 
     orderBook.add(buyOrder);
 
-    const sellOrder = OrderBuilder.aSellOrder().withPrice(100).withQuantity(10).build();
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
 
     const result = matchingEngine.process(sellOrder);
 
     expect(result.trades).toHaveLength(1);
     const trade = result.trades[0];
     expect(trade!.quantity.value).toBe(10);
-  })
+  });
 
   it("records the resting order price as the trade price", () => {
     const { orderBook, matchingEngine } = createMatchingEngine();
 
-    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).withQuantity(10).build();
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
     orderBook.add(buyOrder);
 
-    const sellOrder = OrderBuilder.aSellOrder().withPrice(99).withQuantity(10).build();
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(99)
+      .withQuantity(10)
+      .build();
 
     const result = matchingEngine.process(sellOrder);
 
     expect(result.trades).toHaveLength(1);
     const trade = result.trades[0];
     expect(trade!.price.value).toBe(100);
-  })
+  });
 
   it("records the resting order id on the trade", () => {
-    const {orderBook, matchingEngine} = createMatchingEngine();
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
-    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).withQuantity(10).build();
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
     orderBook.add(buyOrder);
 
-    const sellOrder = OrderBuilder.aSellOrder().withPrice(99).withQuantity(10).build();
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(99)
+      .withQuantity(10)
+      .build();
 
     const result = matchingEngine.process(sellOrder);
 
     expect(result.trades).toHaveLength(1);
     const trade = result.trades[0];
     expect(trade!.restingOrderId).toBe(buyOrder.id);
-  })
+  });
 
   it("records the incoming order id on the trade", () => {
-    const { orderBook, matchingEngine} = createMatchingEngine();
+    const { orderBook, matchingEngine } = createMatchingEngine();
 
-    const buyOrder = OrderBuilder.aBuyOrder().withPrice(100).withQuantity(10).build();
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
     orderBook.add(buyOrder);
 
-    const sellOrder = OrderBuilder.aSellOrder().withPrice(99).withQuantity(10).build();
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(99)
+      .withQuantity(10)
+      .build();
 
     const result = matchingEngine.process(sellOrder);
 
     expect(result.trades).toHaveLength(1);
     const trade = result.trades[0];
     expect(trade!.incomingOrderId).toBe(sellOrder.id);
-  })
+  });
+
+  it("records the incoming order id on the trade", () => {
+    const { orderBook, matchingEngine } = createMatchingEngine();
+
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(10)
+      .build();
+
+    orderBook.add(buyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(99)
+      .withQuantity(10)
+      .build();
+
+    const result = matchingEngine.process(sellOrder);
+
+    expect(result.trades).toHaveLength(1);
+
+    const trade = result.trades[0];
+
+    expect(trade!.incomingOrderId).toBe(sellOrder.id);
+  });
 });
