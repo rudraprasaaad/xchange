@@ -426,4 +426,45 @@ describe("MatchingEngine", () => {
 
     expect(orderBook.bestAsk()).toBe(secondSellOrder);
   });
+
+  it("stops matching an incoming buy order when the next best sell no longer satisfies the matching policy", () => {
+    const { orderBook, matchingEngine } = createMatchingEngine();
+
+    const firstSellOrder = OrderBuilder.aSellOrder()
+      .withPrice(100)
+      .withQuantity(4)
+      .build();
+
+    const secondSellOrder = OrderBuilder.aSellOrder()
+      .withPrice(102)
+      .withQuantity(6)
+      .build();
+
+    orderBook.add(firstSellOrder);
+    orderBook.add(secondSellOrder);
+
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(101)
+      .withQuantity(10)
+      .build();
+
+    const result = matchingEngine.process(buyOrder);
+    expect(result.trades).toHaveLength(1);
+
+    const trade = result.trades[0];
+
+    expect(trade!.quantity.value).toBe(4);
+    expect(trade!.price.value).toBe(100);
+
+    expect(firstSellOrder.isFilled()).toBe(true);
+
+    expect(secondSellOrder.isFilled()).toBe(false);
+    expect(secondSellOrder.getRemainingQuantity().value).toBe(6);
+
+    expect(buyOrder.isFilled()).toBe(false);
+    expect(buyOrder.getRemainingQuantity().value).toBe(6);
+
+    expect(orderBook.bestAsk()).toBe(secondSellOrder);
+    expect(orderBook.bestBid()).toBe(buyOrder);
+  });
 });
