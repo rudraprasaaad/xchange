@@ -14,43 +14,38 @@ export class MatchingEngine {
   process(incomingOrder: Order): MatchingResult {
     const trades: Trade[] = [];
 
-    while(!incomingOrder.isFilled()) {
+    while (!incomingOrder.isFilled()) {
       const restingOrder =
-      incomingOrder.side === "buy"
-        ? this.orderBook.bestAsk()
-        : this.orderBook.bestBid();
+        incomingOrder.side === "buy"
+          ? this.orderBook.bestAsk()
+          : this.orderBook.bestBid();
 
-    if (restingOrder === null) {
-      this.orderBook.add(incomingOrder);
+      if (restingOrder === null) break;
 
-      return {
-        trades: [],
-        restingOrder: incomingOrder,
-      };
+      if (!this.matchingPolicy.canMatch(incomingOrder, restingOrder)) break;
+
+      const tradedQuantity = new OrderQuantity(
+        Math.min(
+          incomingOrder.getRemainingQuantity().value,
+          restingOrder.getRemainingQuantity().value,
+        ),
+      );
+
+      restingOrder.fill(tradedQuantity);
+      incomingOrder.fill(tradedQuantity);
+
+      if (restingOrder.isFilled()) this.orderBook.remove(restingOrder);
+
+      trades.push(
+        new Trade(
+          tradedQuantity,
+          restingOrder.price,
+          restingOrder.id,
+          incomingOrder.id,
+        ),
+      );
     }
 
-    if (!this.matchingPolicy.canMatch(incomingOrder, restingOrder)) {
-      return {
-        trades: [],
-        restingOrder: incomingOrder,
-      };
-    }
-
-    const tradedQuantity = new OrderQuantity(
-      Math.min(
-        incomingOrder.getRemainingQuantity().value,
-        restingOrder.getRemainingQuantity().value,
-      ),
-    );
-
-    restingOrder.fill(tradedQuantity);
-    incomingOrder.fill(tradedQuantity);
-
-    if (restingOrder.isFilled()) this.orderBook.remove(restingOrder);
-
-    trades.push(new Trade(tradedQuantity, restingOrder.price, restingOrder.id, incomingOrder.id));
-    }
-    
     if (!incomingOrder.isFilled()) this.orderBook.add(incomingOrder);
 
     return {

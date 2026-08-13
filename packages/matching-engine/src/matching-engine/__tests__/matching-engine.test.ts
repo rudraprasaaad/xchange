@@ -348,4 +348,44 @@ describe("MatchingEngine", () => {
 
     expect(trade!.incomingOrderId).toBe(sellOrder.id);
   });
+
+  it("stops matching when the next best order no longer satisfies the matching policy", () => {
+    const { orderBook, matchingEngine } = createMatchingEngine();
+
+    const firstBuyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(4)
+      .build();
+
+    const secondBuyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(98)
+      .withQuantity(6)
+      .build();
+
+    orderBook.add(firstBuyOrder);
+    orderBook.add(secondBuyOrder);
+
+    expect(orderBook.bestBid()).toBe(firstBuyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(99)
+      .withQuantity(10)
+      .build();
+
+    const result = matchingEngine.process(sellOrder);
+
+    expect(result.trades).toHaveLength(1);
+
+    const trade = result.trades[0];
+
+    expect(trade!.quantity.value).toBe(4);
+    expect(trade!.price.value).toBe(100);
+
+    expect(firstBuyOrder.isFilled()).toBe(true);
+    expect(secondBuyOrder.isFilled()).toBe(false);
+    expect(secondBuyOrder.getRemainingQuantity().value).toBe(6);
+
+    expect(sellOrder.isFilled()).toBe(false);
+    expect(sellOrder.getRemainingQuantity().value).toBe(6);
+  });
 });
