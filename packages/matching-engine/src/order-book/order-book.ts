@@ -21,6 +21,8 @@ export class OrderBook {
       this.bidSide.remove(order);
       return;
     }
+
+    this.askSide.remove(order);
   }
 
   bestBid(): Order | null {

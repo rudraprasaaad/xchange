@@ -388,4 +388,42 @@ describe("MatchingEngine", () => {
     expect(sellOrder.isFilled()).toBe(false);
     expect(sellOrder.getRemainingQuantity().value).toBe(6);
   });
+
+  it("continues matching an incoming buy order against multiple resting sell orders", () => {
+    const { orderBook, matchingEngine } = createMatchingEngine();
+
+    const firstSellOrder = OrderBuilder.aSellOrder()
+      .withPrice(100)
+      .withQuantity(6)
+      .build();
+    const secondSellOrder = OrderBuilder.aSellOrder()
+      .withPrice(102)
+      .withQuantity(6)
+      .build();
+
+    orderBook.add(firstSellOrder);
+    orderBook.add(secondSellOrder);
+
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(103)
+      .withQuantity(10)
+      .build();
+
+    const result = matchingEngine.process(buyOrder);
+
+    expect(result.trades).toHaveLength(2);
+
+    expect(result.trades[0]!.quantity.value).toBe(6);
+    expect(result.trades[0]!.price.value).toBe(100);
+
+    expect(result.trades[1]!.quantity.value).toBe(4);
+    expect(result.trades[1]!.price.value).toBe(102);
+
+    expect(firstSellOrder.isFilled()).toBe(true);
+    expect(secondSellOrder.isFilled()).toBe(false);
+    expect(secondSellOrder.getRemainingQuantity().value).toBe(2);
+    expect(buyOrder.isFilled()).toBe(true);
+
+    expect(orderBook.bestAsk()).toBe(secondSellOrder);
+  });
 });
