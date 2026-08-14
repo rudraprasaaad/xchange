@@ -505,4 +505,35 @@ describe("MatchingEngine", () => {
 
     expect(orderBook.bestAsk()).toBe(earlierOrder);
   });
+
+  it("matches the earlier buy order first when buy prices are equal", () => {
+    const { orderBook, matchingEngine } = createMatchingEngine();
+
+    const earlierOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(4)
+      .withCreatedAt(new Date("2026-01-01T10:00:00Z"))
+      .build();
+
+    const laterOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(4)
+      .withCreatedAt(new Date("2026-01-01T10:01:00Z"))
+      .build();
+
+      orderBook.add(laterOrder);
+      orderBook.add(earlierOrder);
+
+      const sellOrder = OrderBuilder.aSellOrder()
+        .withPrice(100)
+        .withQuantity(4)
+        .build();
+
+      const result = matchingEngine.process(sellOrder);
+
+      expect(result.trades).toHaveLength(1);
+      expect(earlierOrder.isFilled()).toBe(true);
+      expect(laterOrder.isFilled()).toBe(false);
+      expect(laterOrder.getRemainingQuantity().value).toBe(4);
+  });
 });
