@@ -1,18 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { AskOrderComparator } from "../../order-book/comparator/ask-order-comparator";
-import { BidOrderComparator } from "../../order-book/comparator/bid-order-comparator";
 import { OrderBook } from "../../order-book/order-book";
-import { OrderBookSide } from "../../order-book/order-book-side";
 import { MatchingEngine } from "../matching-engine";
 import { OrderBuilder } from "../../test/builders/order-builder";
 import { MatchingPolicy } from "../../matching/matching-policy";
-import { Order } from "../../order/order";
 
 function createOrderBook() {
-  return new OrderBook(
-    new OrderBookSide(new BidOrderComparator()),
-    new OrderBookSide(new AskOrderComparator()),
-  );
+  return new OrderBook();
 }
 
 function createMatchingEngine() {

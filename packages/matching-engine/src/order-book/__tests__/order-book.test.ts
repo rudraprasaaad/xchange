@@ -1,18 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import { OrderBook } from "../order-book";
-import { OrderBookSide } from "../order-book-side";
-import { BidOrderComparator } from "../comparator/bid-order-comparator";
-import { AskOrderComparator } from "../comparator/ask-order-comparator";
 import { OrderBuilder } from "../../test/builders/order-builder";
 import { MatchingEngine } from "../../matching-engine/matching-engine";
 import { MatchingPolicy } from "../../matching/matching-policy";
 
 function createOrderBook() {
-  return new OrderBook(
-    new OrderBookSide(new BidOrderComparator()),
-    new OrderBookSide(new AskOrderComparator()),
-  );
+  return new OrderBook();
 }
 
 describe("OrderBook", () => {

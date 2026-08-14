@@ -1,11 +1,15 @@
 import { Order } from "../order/order";
+import { AskOrderComparator } from "./comparator/ask-order-comparator";
+import { BidOrderComparator } from "./comparator/bid-order-comparator";
 import { OrderBookSide } from "./order-book-side";
 
 export class OrderBook {
-  constructor(
-    private readonly bidSide: OrderBookSide,
-    private readonly askSide: OrderBookSide,
-  ) {}
+  private readonly bidSide: OrderBookSide;
+  private readonly askSide: OrderBookSide;
+  constructor() {
+    this.bidSide = new OrderBookSide(new BidOrderComparator());
+    this.askSide = new OrderBookSide(new AskOrderComparator());
+  }
 
   add(order: Order): void {
     if (order.side === "buy") {
