@@ -5,6 +5,8 @@ import { OrderBookSide } from "../order-book-side";
 import { BidOrderComparator } from "../comparator/bid-order-comparator";
 import { AskOrderComparator } from "../comparator/ask-order-comparator";
 import { OrderBuilder } from "../../test/builders/order-builder";
+import { MatchingEngine } from "../../matching-engine/matching-engine";
+import { MatchingPolicy } from "../../matching/matching-policy";
 
 function createOrderBook() {
   return new OrderBook(
@@ -68,5 +70,42 @@ describe("OrderBook", () => {
     const orderBook = createOrderBook();
 
     expect(orderBook.bestAsk()).toBeNull();
+  });
+
+  it("removes an order from the order book when cancelled", () => {
+    const orderBook = createOrderBook();
+
+    const order = OrderBuilder.aBuyOrder().withPrice(100).build();
+
+    orderBook.add(order);
+
+    orderBook.remove(order);
+
+    expect(orderBook.bestBid()).toBeNull();
+  });
+
+  it("does not match an order after it is removed from the order book", () => {
+    const orderBook = createOrderBook();
+
+    const matchingEngine = new MatchingEngine(orderBook, new MatchingPolicy());
+    const buyOrder = OrderBuilder.aBuyOrder()
+      .withPrice(100)
+      .withQuantity(4)
+      .build();
+
+    orderBook.add(buyOrder);
+    orderBook.remove(buyOrder);
+
+    const sellOrder = OrderBuilder.aSellOrder()
+      .withPrice(100)
+      .withQuantity(4)
+      .build();
+    orderBook.add(sellOrder);
+
+    const result = matchingEngine.process(sellOrder);
+
+    expect(result.trades).toHaveLength(0);
+    expect(sellOrder.isFilled()).toBe(false);
+    expect(orderBook.bestAsk()).toBe(sellOrder);
   });
 });

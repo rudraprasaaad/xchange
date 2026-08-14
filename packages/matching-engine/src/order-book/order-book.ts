@@ -18,11 +18,20 @@ export class OrderBook {
 
   remove(order: Order): void {
     if (order.side === "buy") {
-      this.bidSide.remove(order);
+      this.bidSide.remove(order.id);
       return;
     }
 
-    this.askSide.remove(order);
+    this.askSide.remove(order.id);
+  }
+
+  cancel(order: Order): void {
+    if (order.side === "buy") {
+      this.bidSide.remove(order.id);
+      return;
+    }
+
+    this.askSide.remove(order.id);
   }
 
   bestBid(): Order | null {

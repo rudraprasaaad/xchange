@@ -1,4 +1,5 @@
 import { Order } from "../order/order";
+import { OrderId } from "../order/order-id";
 import { OrderComparator } from "./comparator/order-comparator";
 
 export class OrderBookSide {
@@ -11,9 +12,9 @@ export class OrderBookSide {
     this.orders.sort(this.comparator.compare);
   }
 
-  remove(order: Order): void {
+  remove(orderId: OrderId): void {
     const index = this.orders.findIndex((existingOrder) =>
-      existingOrder.id.equals(order.id),
+      existingOrder.id.equals(orderId),
     );
 
     if (index === -1) throw new Error("Order not found");
