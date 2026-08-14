@@ -1,12 +1,7 @@
 import {
   MatchingEngine,
   MatchingPolicy,
-  Order,
   OrderBook,
-  OrderCreatedAt,
-  OrderId,
-  OrderPrice,
-  OrderQuantity,
 } from "@repo/matching-engine";
 import { describe, expect, it } from "vitest";
 import { PlaceOrder } from "../place-order";
