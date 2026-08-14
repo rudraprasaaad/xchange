@@ -2,9 +2,17 @@
 
 A monorepo for a stock exchange platform built with Turborepo and pnpm workspaces.
 
+## What's new (14 Aug 2026)
+
+- **`@repo/matching-engine` public exports** — `src/index.ts` re-exports the matching engine, order book, order value objects, and `Trade` for other workspaces.
+- **`OrderBook` owns its sides** — `new OrderBook()` builds bid/ask `OrderBookSide`s with `BidOrderComparator` / `AskOrderComparator`. Callers no longer inject sides.
+- **Removal on both sides** — `remove(order)` routes by `order.side` to the bid or ask book. `OrderBookSide.remove` takes an `OrderId`.
+- **`cancel(order)`** — same routing as `remove` (cancel vs fill-removal is not split further yet).
+- **`exchange-api` app** — new workspace depending on `@repo/matching-engine`. `PlaceOrder` maps a `PlaceOrderInput` into an `Order` and calls `MatchingEngine.process`.
+
 ## Implementation Status
 
-The project is in early development. The `@repo/matching-engine` package contains a working, test-driven core for limit-order matching. The `web` and `docs` apps are still default Turborepo/Next.js starters and are not yet connected to the matching engine.
+The project is in early development. `@repo/matching-engine` is a working, test-driven limit-order matching core. `exchange-api` has a first application use case (`PlaceOrder`) on top of that core. The `web` and `docs` apps are still default Turborepo/Next.js starters and are not yet connected to the matching engine.
 
 ### Implemented
 
@@ -12,18 +20,20 @@ The project is in early development. The `@repo/matching-engine` package contain
 |---|---|
 | Order domain model (value objects + `Order` aggregate) | Done |
 | Price-time priority order book (bid/ask sides + comparators) | Done |
+| `OrderBook` no-arg construction and remove/cancel on both sides | Done |
 | Limit-order matching policy (price crossing rules) | Done |
 | Matching engine (`process` with partial fills and multi-trade loop) | Done |
 | Trade recording (quantity, price, resting/incoming order IDs) | Done |
+| Public package exports (`src/index.ts`) | Done |
 | Unit tests for orders, order book, and matching engine | Done |
+| `PlaceOrder` use case in `exchange-api` | Done |
 
 ### Not yet implemented
 
-- Public package exports (`src/index.ts`)
+- HTTP/API surface, persistence, or market data feeds
 - Integration with `web` or `docs` apps
-- API layer, persistence, or market data feeds
 - Time-priority tie-breaking tests (`createdAt` ordering)
-- Ask-side removal in `OrderBook.remove` (sell orders are not removed from the ask side yet)
+- Distinct cancel vs fill-removal behavior (`cancel` currently matches `remove`)
 
 ## Matching Engine
 
@@ -60,14 +70,16 @@ An `Order` exposes three methods:
 
 ### Order book
 
-The `OrderBook` class maintains two `OrderBookSide` instances, one for bids (buy orders) and one for asks (sell orders). Orders are added via `add(order)`, which routes the order to the correct side based on `order.side`. The current best price on each side is available via `bestBid()` and `bestAsk()`. `remove(order)` removes a resting order once it has been fully filled.
+`OrderBook` is constructed with `new OrderBook()`. The constructor creates a bid side (`BidOrderComparator`) and an ask side (`AskOrderComparator`). Orders are added via `add(order)`, which routes by `order.side`. `bestBid()` and `bestAsk()` return the current best order on each side. `getBidSide()` and `getAsksSide()` expose the sides.
+
+`remove(order)` and `cancel(order)` both route by `order.side` and drop the order from that side.
 
 Each `OrderBookSide` keeps its orders sorted using an `OrderComparator`:
 
 - `BidOrderComparator` — sorts by highest price first, then earliest `createdAt` (price-time priority for buy orders)
 - `AskOrderComparator` — sorts by lowest price first, then earliest `createdAt` (price-time priority for sell orders)
 
-`OrderBookSide.best()` returns the highest-priority order (or `null` if the side is empty), `getOrders()` exposes the full sorted list, and `remove(order)` finds the matching order by `OrderId` and splices it out (throwing if it isn't present).
+`OrderBookSide.best()` returns the highest-priority order (or `null` if the side is empty), `getOrders()` exposes the full sorted list, and `remove(orderId)` finds the matching order by `OrderId` and splices it out (throwing if it isn't present).
 
 ### Matching engine
 
@@ -101,7 +113,7 @@ Tests use the `OrderBuilder` test helper (`src/test/builders/order-builder.ts`) 
 |---|---|
 | `Order` | Fill reduces remaining quantity; full fill detection (buy and sell) |
 | `OrderBookSide` | Empty side; single order; ask price priority; bid price priority |
-| `OrderBook` | Routing buy/sell to correct side; `bestBid`/`bestAsk`; empty-side null returns |
+| `OrderBook` | Routing buy/sell to correct side; `bestBid`/`bestAsk`; empty-side null returns; remove so the order no longer matches |
 | `MatchingEngine` | Resting on empty book; crossing and non-crossing prices; quantity reduction; partial fills (resting and incoming); resting order removal; partially filled incoming added to book; multi-trade loop across multiple resting orders; trade quantity, price, resting order ID, and incoming order ID |
 
 ## Utilities
@@ -115,10 +127,17 @@ Tests use the `OrderBuilder` test helper (`src/test/builders/order-builder.ts`) 
 
 - `web`: the main Next.js application (starter scaffold)
 - `docs`: Next.js documentation app (starter scaffold)
+- `exchange-api`: application layer on the matching engine (`PlaceOrder`)
 - `@repo/matching-engine`: core order matching engine
 - `@repo/ui`: shared React component library
 - `@repo/eslint-config`: shared ESLint configuration
 - `@repo/typescript-config`: shared TypeScript configuration
+
+## Exchange API
+
+`apps/exchange-api` depends on `@repo/matching-engine`. `PlaceOrder.execute(input)` builds an `Order` from `PlaceOrderInput` (`id`, `side`, `price`, `quantity`, `createdAt`) and returns `MatchingEngine.process(order)`.
+
+There is no HTTP server yet; this is the first use-case wrapper around the engine.
 
 ## Getting Started
 
@@ -144,4 +163,10 @@ Run matching-engine tests:
 
 ```sh
 turbo test --filter=@repo/matching-engine
+```
+
+Run exchange-api tests:
+
+```sh
+turbo test --filter=exchange-api
 ```
